@@ -14,6 +14,7 @@ import os
 import sys
 import re
 import getopt
+from  __init__ import __version__ as version
 import eyed3
 import shutil
 
@@ -24,11 +25,13 @@ MusicOrganizer
         MusicOrganizer.py [-i <inputFolder>][-o <outputFolder>][-skG]
         MusicOrganizer.py
     Options:
+        -v          --version
         -i <path>   --inputFolder=<path>    [Default: '.']
         -o <path>   --outputFolder=<path>   [Default: '.']
         -s          --same                  [Set output to the same as input (overrides --outputFolder)]
         -k          --keep                  [Keep original mp3s in their starting foler (copies instead of moving)]
         -G          --genre                 [Order songs by genre and then by artist]
+
 
 """
 
@@ -49,7 +52,7 @@ def main(argv):
     sameFolder = False
     # see if any file locations were given
     try:
-        opts, args = getopt.getopt(argv, "hi:o:Gsk", ["inputFolder=", "outputFolder=", "same", "keep", "genre"])
+        opts, args = getopt.getopt(argv, "hi:o:Gskv", ["inputFolder=", "outputFolder=", "same", "keep", "genre", "version"])
     except getopt.GetoptError:
         # if the arguments given created an error, output the help
         print 'test.py -i <inputfolder> [-o <outputfolder> [-h for more help]'
@@ -71,6 +74,9 @@ def main(argv):
             remove = False
         elif opt in ('-s', '--same'):
             sameFolder = True
+        elif opt in ('-v', '--verison'):
+            print version
+            sys.exit(2)
     if(sameFolder):
         outputFolder = inputFolder
 
