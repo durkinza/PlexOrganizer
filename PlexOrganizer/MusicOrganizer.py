@@ -4,6 +4,8 @@
 # args:  -i  location_of_mp3s/
 #        -o  output_location/
 #        -G  organize by genre (genre must be in meta data)
+#        -s  make output folder the same as the input folder
+#        -k  keep files after moving
 # have all mp3 files in sigle folder, with album/artist in the meta data
 # songs without meta data info will be placed in 'unkown' folder
 # BIG THANKS TO stackoverflow.com
@@ -13,38 +15,54 @@ import sys
 import re
 import getopt
 import eyed3
-
+import shutil
 
 def main(argv):
     # set global variables
     global inputFolder
     global outputFolder
     global genre
+    global remove
+    global sameFolder
     # set default folder location to current directory
     inputFolder = '.'
     outputFolder = '.'
     # default genre organization to off
     genre = False
+    remove = True
+    sameFolder = False
     # see if any file locations were given
     try:
-        opts, args = getopt.getopt(argv, "hi:o:G", ["ifile=", "ofile="])
+        opts, args = getopt.getopt(argv, "hi:o:Gsk", ["inputFolder=", "outputFolder="])
     except getopt.GetoptError:
         # if the arguments given created an error, output the help
-        print 'test.py -i <inputfolder> -o <outputfolder> [-G (organize by genre)]'
+        print 'test.py -i <inputfolder> -o <outputfolder> [-G (organize by genre) -k (keep original files) -s (same output uses input folder)]'
         sys.exit(2)
     for opt, arg in opts:
-        if opt == '-h':
+        if opt in ('-h', "--help"):
             # print help
-            print 'MusicOrganizer.py -i <inputfolder> -o <outputfolder>'
+            print 'MusicOrganizer.py -i <inputfolder> -o <outputfolder> [-G (organize by genre) -k (keep original files) -s (same output uses input folder)]'
             sys.exit()
-        elif opt in ("-i", "--ifile"):
+        elif opt in ("-i", "--inputFolder"):
             # overwrite the default file location if one was given
             inputFolder = arg
-        elif opt in ("-o", "--ofile"):
+        elif opt in ("-o", "--outputFolder"):
             # overwrite the default output location if on was given
             outputFolder = arg
         elif opt == '-G':
             genre = True
+        elif opt == '-k':
+            remove = False
+        elif opt == '-s':
+            sameFolder = True
+    if(sameFolder):
+        outputFolder = inputFolder
+    if(remove):
+        print'not keeping'
+        sys.exit(2)
+    if(not sameFolder):
+        print 'not sameFolder'
+        sys.exit(2)
 if __name__ == "__main__":
     main(sys.argv[1:])
 
@@ -133,10 +151,18 @@ for mp3file in unorg_mp3s:
         # if the folder cannot be made
         print 'Error: Could not create sub-folder(s) in '+baseFolder+'/Music'
         sys.exit(1)
-    print 'Moving '+inputFolder+'/'+mp3file+' To '+baseFolder+'/'+song_artist
-    try:
-        os.rename(inputFolder+'/'+mp3file, baseFolder+'/'+song_artist+'/'+mp3file)
-    except os.error:
-        # the mp3 file could not be moved
-        print 'Error: Could not move file to directory'
-        sys.exit(1)
+    if(remove):
+        print 'Moving '+inputFolder+'/'+mp3file+' To '+baseFolder+'/'+song_artist
+        try:
+            os.rename(inputFolder+'/'+mp3file, baseFolder+'/'+song_artist+'/'+mp3file)
+        except os.error:
+            # the mp3 file could not be moved
+            print 'Error: Could not move file to directory'
+            sys.exit(1)
+    else:
+        print 'Copying'+inputFolder+'/'+mp3file+' To '+baseFolder+'/'+song_artist
+        try:
+            shutil.copy(inputFolder+'/'+mp3file, baseFolder+'/'+song_artist+'/'+mp3file)
+        except shutil.Error:
+            print 'Error: Could not move file to directory'
+            sys.exit(1)
