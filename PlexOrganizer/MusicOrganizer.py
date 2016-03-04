@@ -23,7 +23,6 @@ MusicOrganizer
     Usage:
         MusicOrganizer.py [-i <inputFolder>][-o <outputFolder>][-skG]
         MusicOrganizer.py
-        MusicOrganizer.py -U
     Options:
         -i <path>   --inputFolder=<path>    [Default: '.']
         -o <path>   --outputFolder=<path>   [Default: '.']
